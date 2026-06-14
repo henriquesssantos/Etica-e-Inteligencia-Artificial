@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ética e Inteligência Artificial | Futuro Responsável</title>
+  <meta name="description" content="Uma exploração profunda sobre Ética e Inteligência Artificial — desafios, regulamentação, transparência e governança global." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       CSS RESET & VARIABLES
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --cyan:    #00ffff;
+      --cyan-dim: #00bcd4;
+      --blue:    #007bff;
+      --blue-dim: #0056b3;
+      --orange:  #ff8c00;
+      --orange-dim: #cc7000;
+      --red-neon: #ff3c3c;
+      --bg:      #000000;
+      --bg-card: rgba(255,255,255,0.03);
+      --bg-card2: rgba(0,255,255,0.04);
+      --border-cyan: rgba(0,255,255,0.25);
+      --border-blue: rgba(0,123,255,0.3);
+      --border-orange: rgba(255,140,0,0.3);
+      --text-main: #d0e8f0;
+      --text-muted: rgba(180,220,240,0.6);
+      --font-body: 'Exo 2', sans-serif;
+      --font-title: 'Orbitron', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       CANVAS BACKGROUND (grid + particles drawn via JS)
+    ============================================================ */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 4px; }
+
+    /* ============================================================
+       GLOBAL HELPERS
+    ============================================================ */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .neon-cyan {
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan), 0 0 20px var(--cyan), 0 0 40px var(--cyan-dim);
+    }
+    .neon-blue {
+      color: var(--blue);
+      text-shadow: 0 0 8px var(--blue), 0 0 20px var(--blue), 0 0 50px var(--blue-dim);
+    }
+    .neon-orange {
+      color: var(--orange);
+      text-shadow: 0 0 8px var(--orange), 0 0 20px var(--orange), 0 0 45px var(--orange-dim);
+    }
+
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 0;
+    }
+    section:nth-child(even) {
+      background: rgba(0,123,255,0.02);
+    }
+
+    .section-label {
+      font-family: var(--font-title);
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--cyan-dim);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 40px;
+      height: 1px;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+    }
+
+    h2 {
+      font-family: var(--font-title);
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+    h3 {
+      font-family: var(--font-title);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin-bottom: 0.75rem;
+    }
+    p { margin-bottom: 1rem; color: var(--text-main); }
+
+    ul {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    ul li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+    ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      text-shadow: 0 0 6px var(--cyan);
+    }
+
+    /* ============================================================
+       GLASS CARD
+    ============================================================ */
+    .glass-card {
+      background: rgba(0,255,255,0.03);
+      border: 1px solid var(--border-cyan);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(0,255,255,0.05), inset 0 0 20px rgba(0,255,255,0.02);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 40px rgba(0,255,255,0.15), inset 0 0 30px rgba(0,255,255,0.04);
+    }
+
+    .glass-card-orange {
+      background: rgba(255,140,0,0.04);
+      border-color: var(--border-orange);
+      box-shadow: 0 0 20px rgba(255,140,0,0.05), inset 0 0 20px rgba(255,140,0,0.02);
+    }
+    .glass-card-orange:hover {
+      box-shadow: 0 0 40px rgba(255,140,0,0.15), inset 0 0 30px rgba(255,140,0,0.04);
+    }
+
+    .glass-card-blue {
+      background: rgba(0,123,255,0.04);
+      border-color: var(--border-blue);
+      box-shadow: 0 0 20px rgba(0,123,255,0.05), inset 0 0 20px rgba(0,123,255,0.02);
+    }
+    .glass-card-blue:hover {
+      box-shadow: 0 0 40px rgba(0,123,255,0.15);
+    }
+
+    /* ============================================================
+       DIVIDER
+    ============================================================ */
+    .neon-divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      box-shadow: 0 0 10px var(--cyan);
+      margin: 0 0 2.5rem 0;
+    }
+    .neon-divider-orange {
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      box-shadow: 0 0 10px var(--orange);
+    }
+    .neon-divider-blue {
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      box-shadow: 0 0 10px var(--blue);
+    }
+
+    /* ============================================================
+       HIGHLIGHT QUOTE BLOCK
+    ============================================================ */
+    .quote-block {
+      border-left: 3px solid var(--orange);
+      padding: 1.25rem 1.5rem;
+      background: rgba(255,140,0,0.05);
+      border-radius: 0 12px 12px 0;
+      box-shadow: -4px 0 20px rgba(255,140,0,0.2);
+      margin: 1.5rem 0;
+    }
+    .quote-block p {
+      font-style: italic;
+      color: var(--text-main);
+      margin: 0;
+    }
+    .quote-block cite {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--orange);
+      text-shadow: 0 0 6px var(--orange);
+      font-style: normal;
+      letter-spacing: 0.05em;
+    }
+
+    /* ============================================================
+       SECTION IMAGE
+    ============================================================ */
+    .section-img {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid var(--border-cyan);
+      box-shadow: 0 0 30px rgba(0,255,255,0.15);
+      object-fit: cover;
+      display: block;
+    }
+    .section-img-orange {
+      border-color: var(--border-orange);
+      box-shadow: 0 0 30px rgba(255,140,0,0.15);
+    }
+
+    /* ============================================================
+       FLOAT ANIMATION
+    ============================================================ */
+    @keyframes float {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-12px); }
+    }
+    @keyframes float-slow {
+      0%,100% { transform: translateY(0px) rotate(0deg); }
+      50%      { transform: translateY(-8px) rotate(1deg); }
+    }
+    @keyframes pulse-glow {
+      0%,100% { opacity: 0.7; }
+      50%      { opacity: 1; }
+    }
+    @keyframes scan-line {
+      0%   { top: 0; }
+      100% { top: 100%; }
+    }
+    @keyframes glow-pulse {
+      0%,100% {
+        text-shadow: 0 0 8px var(--cyan), 0 0 20px var(--cyan), 0 0 40px var(--cyan-dim);
+      }
+      50% {
+        text-shadow: 0 0 15px var(--cyan), 0 0 35px var(--cyan), 0 0 70px var(--cyan);
+      }
+    }
+    @keyframes border-glow {
+      0%,100% { box-shadow: 0 0 5px var(--cyan), 0 0 15px rgba(0,255,255,0.3); }
+      50%      { box-shadow: 0 0 15px var(--cyan), 0 0 40px rgba(0,255,255,0.5); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .float-img { animation: float-slow 6s ease-in-out infinite; }
+    .pulse-glow { animation: glow-pulse 3s ease-in-out infinite; }
+
+    /* ============================================================
+       NAV
+    ============================================================ */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0.9rem 2rem;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s;
+    }
+    #navbar.scrolled {
+      background: rgba(0,5,15,0.92);
+      border-bottom-color: rgba(0,255,255,0.25);
+    }
+
+    .nav-logo {
+      font-family: var(--font-title);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      letter-spacing: 0.2em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-links a {
+      font-family: var(--font-title);
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: rgba(0,255,255,0.6);
+      text-decoration: none;
+      padding: 0.35rem 0.65rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .nav-links a:hover {
+      color: var(--cyan);
+      border-color: rgba(0,255,255,0.4);
+      background: rgba(0,255,255,0.06);
+      text-shadow: 0 0 8px var(--cyan);
+      box-shadow: 0 0 12px rgba(0,255,255,0.15);
+    }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    #intro {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #intro::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 60% 50%, rgba(0,123,255,0.1) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(0,255,255,0.06) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero-left { position: relative; z-index: 2; animation: fadeInLeft 1s ease both; }
+    .hero-right { position: relative; z-index: 2; animation: fadeInRight 1s ease 0.3s both; }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: var(--font-title);
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      color: var(--cyan);
+      border: 1px solid rgba(0,255,255,0.4);
+      padding: 0.35rem 1rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 15px rgba(0,255,255,0.15);
+      animation: border-glow 3s ease-in-out infinite;
+    }
+
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.1;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(0,255,255,0.4);
+      margin-bottom: 1.5rem;
+    }
+    .hero-title span.line-cyan {
+      display: block;
+      color: var(--cyan);
+      text-shadow: 0 0 15px var(--cyan), 0 0 35px var(--cyan-dim);
+      animation: glow-pulse 4s ease-in-out infinite;
+    }
+    .hero-title span.line-blue {
+      display: block;
+      color: var(--blue);
+      text-shadow: 0 0 15px var(--blue), 0 0 35px var(--blue-dim);
+    }
+    .hero-title span.line-orange {
+      display: block;
+      color: var(--orange);
+      text-shadow: 0 0 15px var(--orange), 0 0 35px var(--orange-dim);
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 480px;
+      border-left: 2px solid var(--blue);
+      padding-left: 1rem;
+    }
+
+    .questao-box {
+      background: rgba(0,255,255,0.04);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(0,255,255,0.08);
+    }
+    .questao-box .label {
+      font-family: var(--font-title);
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: var(--cyan);
+      text-shadow: 0 0 6px var(--cyan);
+      margin-bottom: 0.5rem;
+    }
+    .questao-box p {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: #000;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      padding: 0.9rem 2.2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0,255,255,0.4), 0 0 40px rgba(0,123,255,0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      border-radius: inherit;
+    }
+    .btn-cta:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 0 35px rgba(0,255,255,0.6), 0 0 60px rgba(0,123,255,0.3);
+    }
+    .btn-cta .arrow { font-size: 1rem; }
+
+    /* Hero Image Wrapper */
+    .hero-img-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-img-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 110%;
+      height: 110%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,123,255,0.15) 0%, transparent 70%);
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+    .hero-main-img {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,255,255,0.2);
+      box-shadow: 0 0 60px rgba(0,123,255,0.25), 0 0 30px rgba(0,255,255,0.1);
+      object-fit: cover;
+      animation: float-slow 7s ease-in-out infinite;
+    }
+
+    /* Floating data labels on hero image */
+    .hero-labels {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+    .hero-label-item {
+      position: absolute;
+      font-family: var(--font-title);
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(0,255,255,0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+    }
+    .hero-label-item::after {
+      content: '';
+      position: absolute;
+      background: var(--cyan);
+      box-shadow: 0 0 4px var(--cyan);
+    }
+    .lbl-automacao   { top: 12%; left: 5%; }
+    .lbl-analise     { top: 5%; right: 10%; }
+    .lbl-vies        { top: 40%; right: -5%; }
+    .lbl-transparencia { bottom: 15%; left: 8%; }
+
+    /* ============================================================
+       SECTION 2 — BENEFÍCIOS
+    ============================================================ */
+    #beneficios {
+      background: linear-gradient(180deg, transparent 0%, rgba(0,123,255,0.03) 50%, transparent 100%);
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .benefit-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .benefit-card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 20%;
+      width: 60%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .benefit-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .benefit-card h3 {
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .benefit-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .benefits-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .benefits-intro-img {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       SECTION 3 — DESAFIOS ÉTICOS
+    ============================================================ */
+    #desafios {
+      position: relative;
+    }
+    #desafios::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(255,60,60,0.05) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    .desafios-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .alert-badge {
+      display: inline-block;
+      font-family: var(--font-title);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--orange);
+      border: 1px solid rgba(255,140,0,0.4);
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 0 10px rgba(255,140,0,0.15);
+    }
+
+    .risk-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,60,60,0.15);
+      background: rgba(255,60,60,0.03);
+      margin-bottom: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .risk-item:hover {
+      border-color: rgba(255,60,60,0.35);
+      box-shadow: 0 0 15px rgba(255,60,60,0.1);
+    }
+    .risk-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .risk-item h4 {
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      color: var(--red-neon);
+      text-shadow: 0 0 6px rgba(255,60,60,0.5);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.08em;
+    }
+    .risk-item p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+    .example-box {
+      background: rgba(255,140,0,0.05);
+      border: 1px solid rgba(255,140,0,0.25);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 0 25px rgba(255,140,0,0.08);
+    }
+    .example-box .ex-title {
+      font-family: var(--font-title);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--orange);
+      text-shadow: 0 0 6px var(--orange);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ============================================================
+       SECTION 4 — REGULAMENTAÇÃO FAVORÁVEL
+    ============================================================ */
+    #regulamentacao {
+      position: relative;
+    }
+
+    .reg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .reg-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .reg-card .reg-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .reg-card h3 {
+      color: var(--blue);
+      text-shadow: 0 0 8px var(--blue);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .reg-card p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+    .design-box {
+      background: rgba(0,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .design-box h3 {
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+      font-family: var(--font-title);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       SECTION 5 — CONTRAPONTOS CRÍTICOS
+    ============================================================ */
+    #contrapontos {
+      position: relative;
+    }
+    #contrapontos::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 60%, rgba(255,140,0,0.04) 0%, transparent 55%);
+      z-index: 0;
+    }
+
+    .contra-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .contra-item {
+      padding: 1.25rem 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,140,0,0.2);
+      background: rgba(255,140,0,0.03);
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .contra-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--orange);
+      box-shadow: 0 0 8px var(--orange);
+    }
+    .contra-item:hover {
+      border-color: rgba(255,140,0,0.4);
+      box-shadow: 0 0 20px rgba(255,140,0,0.1);
+    }
+    .contra-item h4 {
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      text-shadow: 0 0 6px rgba(255,140,0,0.5);
+      margin-bottom: 0.4rem;
+    }
+    .contra-item p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+    /* ============================================================
+       SECTION 6 — GOVERNANÇA GLOBAL
+    ============================================================ */
+    #governanca {
+      position: relative;
+    }
+    #governanca::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(0,123,255,0.06) 0%, transparent 65%);
+      z-index: 0;
+    }
+
+    .gov-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .unesco-box {
+      background: rgba(0,123,255,0.04);
+      border: 1px solid rgba(0,123,255,0.25);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .unesco-box h3 {
+      color: var(--blue);
+      text-shadow: 0 0 8px var(--blue);
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+    }
+
+    .carbon-quote {
+      background: rgba(0,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.25);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0,255,255,0.08);
+    }
+    .carbon-quote .cq-label {
+      font-family: var(--font-title);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+    }
+    .carbon-quote p {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    /* ============================================================
+       SECTION 7 — TRANSPARÊNCIA
+    ============================================================ */
+    #transparencia {
+      position: relative;
+      overflow: hidden;
+    }
+    .matrix-bg {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 50px,
+        rgba(0,255,255,0.01) 50px,
+        rgba(0,255,255,0.01) 51px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 30px,
+        rgba(0,255,255,0.01) 30px,
+        rgba(0,255,255,0.01) 31px
+      );
+      z-index: 0;
+    }
+
+    .trans-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .hex-codes {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      color: rgba(0,255,255,0.2);
+      line-height: 1.8;
+      letter-spacing: 0.1em;
+      user-select: none;
+      padding: 1rem;
+      border: 1px solid rgba(0,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.4);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      max-height: 150px;
+    }
+    .hex-codes span.active-hex {
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+    }
+
+    .trans-pillar {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1.25rem;
+      border-radius: 10px;
+      border: 1px solid rgba(0,255,255,0.15);
+      background: rgba(0,255,255,0.02);
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    .trans-pillar:hover {
+      border-color: rgba(0,255,255,0.35);
+      box-shadow: 0 0 20px rgba(0,255,255,0.08);
+      transform: translateX(4px);
+    }
+    .trans-pillar-num {
+      font-family: var(--font-title);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      opacity: 0.4;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .trans-pillar h4 {
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      text-shadow: 0 0 6px rgba(0,255,255,0.4);
+      margin-bottom: 0.25rem;
+    }
+    .trans-pillar p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+    /* ============================================================
+       SECTION 8 — PROTEÇÃO DE DADOS
+    ============================================================ */
+    #protecao {
+      position: relative;
+    }
+
+    .prot-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .shield-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .shield-item {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(0,255,255,0.15);
+      background: rgba(0,255,255,0.02);
+      transition: all 0.3s;
+    }
+    .shield-item:hover {
+      border-color: rgba(0,255,255,0.4);
+      box-shadow: 0 0 20px rgba(0,255,255,0.1);
+      transform: translateY(-4px);
+    }
+    .shield-item .si-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .shield-item h4 {
+      font-family: var(--font-title);
+      font-size: 0.65rem;
+      color: var(--cyan);
+      text-shadow: 0 0 6px var(--cyan);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .shield-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+
+    .gov-multi-box {
+      background: rgba(0,123,255,0.04);
+      border: 1px solid rgba(0,123,255,0.2);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .gov-multi-box h3 {
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      text-shadow: 0 0 6px var(--blue);
+      margin-bottom: 1rem;
+    }
+    .gov-multi-box ul li::before { color: var(--blue); }
+
+    /* ============================================================
+       SECTION 9 — CONCLUSÃO
+    ============================================================ */
+    #conclusao {
+      position: relative;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+    }
+    #conclusao::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(0,255,255,0.06) 0%, transparent 55%),
+                  radial-gradient(ellipse at 50% 80%, rgba(255,140,0,0.05) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .concl-inner {
+      text-align: center;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .final-badge {
+      display: inline-block;
+      font-family: var(--font-title);
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      color: var(--cyan);
+      border: 1px solid rgba(0,255,255,0.4);
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 15px rgba(0,255,255,0.15);
+    }
+
+    .concl-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 3rem 0;
+      text-align: left;
+    }
+
+    .concl-col-fav {
+      background: rgba(0,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 14px;
+      padding: 2rem;
+    }
+    .concl-col-fav h3 {
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .concl-col-crit {
+      background: rgba(255,140,0,0.04);
+      border: 1px solid rgba(255,140,0,0.2);
+      border-radius: 14px;
+      padding: 2rem;
+    }
+    .concl-col-crit h3 {
+      color: var(--orange);
+      text-shadow: 0 0 8px var(--orange);
+      font-family: var(--font-title);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .concl-col-crit ul li::before { color: var(--orange); }
+
+    .mega-quote {
+      background: rgba(255,140,0,0.06);
+      border: 1px solid rgba(255,140,0,0.3);
+      border-radius: 16px;
+      padding: 2.5rem 3rem;
+      margin: 2rem 0;
+      box-shadow: 0 0 40px rgba(255,140,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .mega-quote::before {
+      content: '"';
+      position: absolute;
+      top: -0.5rem; left: 1rem;
+      font-size: 8rem;
+      color: rgba(255,140,0,0.08);
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+    .mega-quote blockquote {
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      font-style: italic;
+      color: var(--orange);
+      text-shadow: 0 0 10px rgba(255,140,0,0.4);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .mega-quote cite {
+      font-family: var(--font-title);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,140,0,0.6);
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(0,255,255,0.1);
+      background: rgba(0,0,0,0.5);
+    }
+    footer p {
+      font-family: var(--font-title);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: rgba(0,255,255,0.3);
+      margin: 0;
+    }
+    footer .footer-logo {
+      font-family: var(--font-title);
+      font-size: 1rem;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ============================================================
+       SCAN LINE OVERLAY
+    ============================================================ */
+    .scan-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,255,255,0.008) 2px,
+        rgba(0,255,255,0.008) 4px
+      );
+      z-index: 999;
+      pointer-events: none;
+      animation: none;
+    }
+
+    /* ============================================================
+       SECTION SEPARATOR
+    ============================================================ */
+    .section-sep {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,255,255,0.15) 50%, transparent 100%);
+      margin: 0;
+    }
+
+    /* ============================================================
+       STAT COUNTERS
+    ============================================================ */
+    .stats-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-num {
+      font-family: var(--font-title);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--cyan);
+      text-shadow: 0 0 15px var(--cyan);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .hero-grid,
+      .benefits-intro,
+      .desafios-layout,
+      .contra-layout,
+      .gov-layout,
+      .trans-layout,
+      .prot-layout,
+      .concl-cols { grid-template-columns: 1fr; }
+
+      .reg-grid { grid-template-columns: 1fr 1fr; }
+      .hero-right { order: -1; }
+      .nav-links a { font-size: 0.45rem; padding: 0.25rem 0.45rem; }
+      .hero-title { font-size: 2rem; }
+    }
+
+    @media (max-width: 600px) {
+      .reg-grid { grid-template-columns: 1fr; }
+      .shield-grid { grid-template-columns: 1fr; }
+      .stats-row { justify-content: center; }
+      .mega-quote { padding: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Scan line CRT overlay -->
+  <div class="scan-overlay" aria-hidden="true"></div>
+
+  <!-- Background Canvas -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ====================================================
+       NAV
+  ==================================================== -->
+  <nav id="navbar" role="navigation" aria-label="Navegação principal">
+    <a href="#intro" class="nav-logo">IA ÉTICA</a>
+    <div class="nav-links">
+      <a href="#intro">INTRODUÇÃO</a>
+      <a href="#beneficios">BENEFÍCIOS</a>
+      <a href="#desafios">DESAFIOS ÉTICOS</a>
+      <a href="#regulamentacao">REGULAMENTAÇÃO</a>
+      <a href="#contrapontos">CONTRAPONTOS</a>
+      <a href="#governanca">GOVERNANÇA</a>
+      <a href="#transparencia">PRINCÍPIOS</a>
+      <a href="#protecao">PROTEÇÃO</a>
+      <a href="#conclusao">CONCLUSÃO</a>
+    </div>
+  </nav>
+
+  <!-- ====================================================
+       SEÇÃO 1: HERO / INTRODUÇÃO
+  ==================================================== -->
+  <section id="intro" aria-labelledby="hero-title">
+    <div class="container">
+      <div class="hero-grid">
+
+        <!-- Left Column -->
+        <div class="hero-left">
+          <span class="hero-tag">▸ DEBATE CONTEMPORÂNEO</span>
+          <h1 id="hero-title" class="hero-title">
+            <span class="line-cyan">ÉTICA</span>
+            <span class="line-blue">E</span>
+            <span class="line-orange">INTELIGÊNCIA ARTIFICIAL</span>
+          </h1>
+          <p class="hero-subtitle">
+            A Inteligência Artificial (IA) transforma processos, decisões e serviços de maneira profunda e ininterrompida.
+          </p>
+          <div class="questao-box">
+            <p class="label">◈ QUESTÃO CENTRAL</p>
+            <p>"Não se trata apenas do que a IA pode fazer tecnologicamente, mas de uma profunda reflexão sobre como ela deve agir."</p>
+          </div>
+          <a href="#beneficios" class="btn-cta" id="cta-explorar">
+            EXPLORAR O DEBATE <span class="arrow">↓</span>
+          </a>
+          <div class="stats-row">
+            <div class="stat-item">
+              <span class="stat-num">+190</span>
+              <span class="stat-label">países afetados</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">2030</span>
+              <span class="stat-label">marco regulatório</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">∞</span>
+              <span class="stat-label">implicações éticas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column — Hero Image -->
+        <div class="hero-right">
+          <div class="hero-img-wrapper">
+            <img
+              src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=700&q=80&auto=format&fit=crop"
+              alt="Cérebro neural cibernético com balanças da justiça em estilo neon"
+              class="hero-main-img"
+              loading="eager"
+              id="hero-brain-img"
+            />
+            <div class="hero-labels" aria-hidden="true">
+              <span class="hero-label-item lbl-automacao">AUTOMAÇÃO</span>
+              <span class="hero-label-item lbl-analise">ANÁLISE DE DADOS</span>
+              <span class="hero-label-item lbl-vies">VIÉS ALGORÍTMICO</span>
+              <span class="hero-label-item lbl-transparencia">TRANSPARÊNCIA</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 2: BENEFÍCIOS DA IA
+  ==================================================== -->
+  <section id="beneficios" aria-labelledby="beneficios-title">
+    <div class="container">
+      <p class="section-label">02 — BENEFÍCIOS</p>
+      <h2 id="beneficios-title" class="neon-cyan">Benefícios da Inteligência Artificial</h2>
+      <div class="neon-divider"></div>
+
+      <div class="benefits-intro">
+        <div>
+          <p>A IA tem demonstrado enorme potencial para transformar positivamente múltiplos setores da sociedade. Quando desenvolvida e aplicada com responsabilidade, ela representa um salto qualitativo nos processos humanos — desde a medicina até a gestão pública.</p>
+          <p>Seus benefícios se manifestam em quatro dimensões fundamentais que impactam diretamente a produtividade, a competitividade e o bem-estar coletivo:</p>
+        </div>
+        <div class="benefits-intro-img">
+          <img
+            src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80&auto=format&fit=crop"
+            alt="Robótica e automação industrial com IA"
+            class="section-img"
+            loading="lazy"
+          />
+        </div>
+      </div>
+
+      <div class="benefits-grid">
+
+        <div class="glass-card benefit-card" id="benefit-automacao">
+          <span class="benefit-icon">⚙️</span>
+          <h3>AUTOMAÇÃO</h3>
+          <p>Realização de tarefas repetitivas com maior velocidade e precisão, liberando o capital humano para atividades de maior valor cognitivo e criativo.</p>
+        </div>
+
+        <div class="glass-card benefit-card" id="benefit-analise">
+          <span class="benefit-icon">📊</span>
+          <h3>ANÁLISE DE DADOS</h3>
+          <p>Capacidade de processar e interpretar volumes massivos de informação em tempo real, gerando insights que seriam impossíveis de obter manualmente.</p>
+        </div>
+
+        <div class="glass-card benefit-card" id="benefit-decisoes">
+          <span class="benefit-icon">🧠</span>
+          <h3>DECISÕES ESTRATÉGICAS</h3>
+          <p>Suporte a decisões mais precisas e embasadas em dados, reduzindo a subjetividade e aumentando a eficácia em ambientes complexos e dinâmicos.</p>
+        </div>
+
+        <div class="glass-card benefit-card" id="benefit-eficiencia">
+          <span class="benefit-icon">⚡</span>
+          <h3>EFICIÊNCIA</h3>
+          <p>Otimização de recursos em setores como saúde, educação, logística e governo, com redução significativa de custos operacionais e ampliação do alcance dos serviços.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 3: DESAFIOS ÉTICOS
+  ==================================================== -->
+  <section id="desafios" aria-labelledby="desafios-title">
+    <div class="container">
+      <p class="section-label">03 — DESAFIOS ÉTICOS</p>
+      <h2 id="desafios-title" class="neon-orange">Desafios Éticos da IA</h2>
+      <div class="neon-divider neon-divider-orange"></div>
+
+      <div class="desafios-layout">
+
+        <!-- Left: risks -->
+        <div>
+          <p>Apesar dos benefícios, a expansão acelerada da IA traz consigo riscos éticos significativos que não podem ser ignorados. Estes desafios exigem atenção urgente de governos, empresas e da sociedade civil.</p>
+
+          <span class="alert-badge">⚠ PRINCIPAIS RISCOS</span>
+
+          <div class="risk-item" id="risk-vies">
+            <span class="risk-icon">⚡</span>
+            <div>
+              <h4>VIÉS ALGORÍTMICO</h4>
+              <p>Sistemas de IA treinados com dados históricos podem perpetuar e amplificar preconceitos existentes na sociedade, gerando discriminação sistêmica em decisões automatizadas.</p>
+            </div>
+          </div>
+
+          <div class="risk-item" id="risk-responsabilidade">
+            <span class="risk-icon">⚖️</span>
+            <div>
+              <h4>RESPONSABILIDADE</h4>
+              <p>Quando uma IA toma uma decisão incorreta ou prejudicial, surge a questão: quem é responsável? O desenvolvedor, o operador, ou a própria máquina?</p>
+            </div>
+          </div>
+
+          <div class="risk-item" id="risk-privacidade">
+            <span class="risk-icon">🔒</span>
+            <div>
+              <h4>PRIVACIDADE E VIGILÂNCIA</h4>
+              <p>O uso de IA em sistemas de reconhecimento facial e análise de comportamento levanta sérias questões sobre vigilância em massa e erosão da privacidade individual.</p>
+            </div>
+          </div>
+
+          <div class="risk-item" id="risk-autonomia">
+            <span class="risk-icon">🤖</span>
+            <div>
+              <h4>AUTONOMIA HUMANA</h4>
+              <p>A crescente delegação de decisões a sistemas automatizados pode reduzir a agência humana e criar dependências tecnológicas problemáticas.</p>
+            </div>
+          </div>
+
+          <div class="example-box" id="exemplo-credito">
+            <p class="ex-title">◈ EXEMPLO PRÁTICO</p>
+            <h4 style="color: var(--orange); font-family: var(--font-title); font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Sistemas de Crédito Automatizados</h4>
+            <p style="font-size: 0.88rem;">Algoritmos de concessão de crédito alimentados com dados históricos tendem a reproduzir desigualdades socioeconômicas: negam crédito com maior frequência a grupos historicamente marginalizados — não por malícia, mas por aprenderem padrões de um passado injusto. O viés é invisível, mas seus efeitos são concretos e mensuráveis.</p>
+          </div>
+        </div>
+
+        <!-- Right: image -->
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&q=80&auto=format&fit=crop"
+            alt="Código complexo representando viés algorítmico"
+            class="section-img section-img-orange float-img"
+            loading="lazy"
+            style="margin-bottom: 1.5rem;"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80&auto=format&fit=crop"
+            alt="Matrix de dados e algoritmos"
+            class="section-img section-img-orange"
+            loading="lazy"
+            style="border-color: rgba(255,60,60,0.3); box-shadow: 0 0 30px rgba(255,60,60,0.15);"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 4: REGULAMENTAÇÃO FAVORÁVEL
+  ==================================================== -->
+  <section id="regulamentacao" aria-labelledby="reg-title">
+    <div class="container">
+      <p class="section-label">04 — REGULAMENTAÇÃO</p>
+      <h2 id="reg-title" class="neon-blue">Regulamentação: Argumentos Favoráveis</h2>
+      <div class="neon-divider neon-divider-blue"></div>
+
+      <p>A regulamentação da IA é defendida por especialistas e organismos internacionais como uma necessidade urgente para garantir que os avanços tecnológicos sirvam ao bem comum. Os argumentos favoráveis à regulamentação se estruturam em três pilares fundamentais:</p>
+
+      <div class="reg-grid">
+        <div class="glass-card glass-card-blue reg-card" id="reg-direitos">
+          <span class="reg-icon">🛡️</span>
+          <h3>PROTEGER DIREITOS</h3>
+          <p>Estabelecer limites claros ao uso de IA para garantir que direitos fundamentais — como privacidade, liberdade e não discriminação — sejam respeitados em ambiente digital.</p>
+        </div>
+
+        <div class="glass-card glass-card-blue reg-card" id="reg-discriminacao">
+          <span class="reg-icon">⚖️</span>
+          <h3>REDUZIR DISCRIMINAÇÕES</h3>
+          <p>Normas regulatórias podem obrigar que sistemas de IA sejam auditados e certificados como não discriminatórios antes de sua implantação em serviços públicos e privados.</p>
+        </div>
+
+        <div class="glass-card glass-card-blue reg-card" id="reg-transparencia">
+          <span class="reg-icon">🔍</span>
+          <h3>TRANSPARÊNCIA</h3>
+          <p>Exigir que as decisões automatizadas sejam explicáveis e compreensíveis — o chamado "direito à explicação" — permite que cidadãos contestem resultados injustos.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; margin-top: 2rem;">
+        <div>
+          <div class="design-box" id="etica-by-design">
+            <h3>◈ ÉTICA BY DESIGN</h3>
+            <p>O conceito de "Ética by Design" propõe que considerações éticas sejam incorporadas desde a fase de concepção e desenvolvimento dos sistemas de IA — e não apenas como uma correção posterior.</p>
+            <p>Isso implica que desenvolvedores devem ser treinados em ética, equipes devem ser multidisciplinares e os processos de desenvolvimento devem incluir etapas formais de avaliação de impacto social.</p>
+          </div>
+
+          <div class="design-box" style="margin-top: 1.5rem;" id="beneficios-esperados">
+            <h3>◈ BENEFÍCIOS ESPERADOS</h3>
+            <ul>
+              <li>Maior confiança pública nos sistemas de IA</li>
+              <li>Redução de litígios e responsabilidades legais</li>
+              <li>Desenvolvimento mais sustentável e responsável</li>
+              <li>Padrões internacionais harmonizados</li>
+              <li>Proteção de grupos vulneráveis e minorias</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80&auto=format&fit=crop"
+            alt="Mãos digitando em computador com código de proteção digital"
+            class="section-img"
+            style="border-color: rgba(0,123,255,0.3); box-shadow: 0 0 30px rgba(0,123,255,0.15);"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 5: CONTRAPONTOS CRÍTICOS
+  ==================================================== -->
+  <section id="contrapontos" aria-labelledby="contra-title">
+    <div class="container">
+      <p class="section-label">05 — CONTRAPONTOS CRÍTICOS</p>
+      <h2 id="contra-title" class="neon-orange">Regulamentação: Contrapontos Críticos</h2>
+      <div class="neon-divider neon-divider-orange"></div>
+
+      <div class="contra-layout">
+
+        <div>
+          <p>Nem todos concordam que a regulamentação estatal é a melhor resposta para os desafios éticos da IA. Uma corrente crítica substancial argumenta que a intervenção governamental pode ser mais prejudicial do que benéfica:</p>
+
+          <div class="contra-item" id="contra-preocupacoes">
+            <h4>⚠ PREOCUPAÇÕES CENTRAIS</h4>
+            <p>Regulamentações excessivamente rígidas podem sufocar a inovação tecnológica, prejudicar a competitividade das empresas nacionais frente a concorrentes internacionais e criar barreiras de entrada que beneficiam apenas grandes corporações já estabelecidas.</p>
+          </div>
+
+          <div class="contra-item" id="contra-estado">
+            <h4>⚠ O ESTADO E A MORALIDADE</h4>
+            <p>Há um debate filosófico profundo sobre se o Estado tem a legitimidade e a competência para legislar sobre questões essencialmente morais. Quem define o que é "ético" em IA? Diferentes culturas, religiões e sistemas políticos têm visões distintas sobre valores fundamentais.</p>
+          </div>
+
+          <div class="contra-item" id="contra-conhecimento">
+            <h4>⚠ RESTRIÇÃO DO CONHECIMENTO</h4>
+            <p>Regulamentações podem limitar o acesso a ferramentas e tecnologias de IA, especialmente para pequenas empresas, pesquisadores independentes e países em desenvolvimento, aprofundando a desigualdade tecnológica global.</p>
+          </div>
+
+          <div class="contra-item" id="contra-inovacao">
+            <h4>⚠ BUROCRACIA VS. INOVAÇÃO</h4>
+            <p>O ritmo da inovação em IA supera em muito a capacidade dos sistemas legislativos de acompanhá-la. Leis criadas hoje podem se tornar obsoletas em poucos anos, gerando um marco regulatório desatualizado e contraproducente.</p>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1568659358539-5cf5f8e6f35a?w=600&q=80&auto=format&fit=crop"
+            alt="Burocracia e restrição tecnológica representadas visualmente"
+            class="section-img section-img-orange float-img"
+            loading="lazy"
+            style="margin-bottom: 1.5rem;"
+          />
+
+          <div class="quote-block">
+            <p>"A solução para a falta de ética não é necessariamente mais legislação — é mais cultura, educação e responsabilidade corporativa voluntária."</p>
+            <cite>— Perspectiva Libertária sobre Regulamentação de IA</cite>
+          </div>
+
+          <img
+            src="https://images.unsplash.com/photo-1589792923122-6c05f1f92090?w=600&q=80&auto=format&fit=crop"
+            alt="Tecnologia e inovação versus restrições legais"
+            class="section-img section-img-orange"
+            loading="lazy"
+            style="margin-top: 1.5rem;"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 6: GOVERNANÇA GLOBAL
+  ==================================================== -->
+  <section id="governanca" aria-labelledby="gov-title">
+    <div class="container">
+      <p class="section-label">06 — GOVERNANÇA GLOBAL</p>
+      <h2 id="gov-title" class="neon-blue">Governança Global e Organizações</h2>
+      <div class="neon-divider neon-divider-blue"></div>
+
+      <div class="gov-layout">
+
+        <div>
+          <p>A natureza transfronteiriça da IA torna a governança global uma necessidade imperativa. Nenhum país, isoladamente, pode regular efetivamente uma tecnologia que ultrapassa fronteiras nacionais em milissegundos.</p>
+
+          <div class="unesco-box" id="papel-unesco">
+            <h3>◈ PAPEL DA UNESCO</h3>
+            <p>A UNESCO lidera esforços globais para estabelecer um marco ético internacional para a IA. Em 2021, adotou a "Recomendação sobre a Ética da Inteligência Artificial" — o primeiro instrumento normativo global sobre o tema, endossado por 193 estados membros.</p>
+            <ul>
+              <li>Promove diretrizes para uso responsável e inclusivo da IA</li>
+              <li>Defende que a IA deve fortalecer — e não substituir — a supervisão humana</li>
+              <li>Estabelece princípios como dignidade humana, diversidade, inclusão e sustentabilidade ambiental</li>
+              <li>Orienta políticas nacionais de IA com base em valores universais</li>
+            </ul>
+          </div>
+
+          <div class="contra-item" style="border-color: rgba(0,123,255,0.2); background: rgba(0,123,255,0.03);" id="contraponto-unesco">
+            <h4 style="color: var(--blue);">◈ CONTRAPONTO</h4>
+            <p>Críticos argumentam que organismos como a UNESCO têm poder de recomendação, mas carecem de mecanismos de enforcement efetivos. As recomendações são voluntárias e países com interesses econômicos na expansão irrestrita da IA tendem a ignorá-las quando conveniente.</p>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop"
+            alt="Globo terrestre cibernético com conexões de dados em neon azul"
+            class="section-img float-img"
+            style="border-color: rgba(0,123,255,0.3); box-shadow: 0 0 30px rgba(0,123,255,0.2); margin-bottom: 1.5rem;"
+            loading="lazy"
+          />
+
+          <div class="carbon-quote" id="carbon-quote-box">
+            <p class="cq-label">◈ IMPACTO AMBIENTAL</p>
+            <p>O treinamento de modelos de IA de grande escala consome energia equivalente à emissão de <strong style="color: var(--cyan);">centenas de toneladas de CO₂</strong> — comparável às emissões de múltiplos voos transatlânticos. A governança global de IA deve, portanto, incluir dimensões de sustentabilidade ambiental e metas de redução de carbono no desenvolvimento tecnológico.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 7: PRINCÍPIO DA TRANSPARÊNCIA
+  ==================================================== -->
+  <section id="transparencia" aria-labelledby="trans-title">
+    <div class="matrix-bg" aria-hidden="true"></div>
+    <div class="container">
+      <p class="section-label">07 — PRINCÍPIOS</p>
+      <h2 id="trans-title" class="neon-cyan">Princípio da Transparência</h2>
+      <div class="neon-divider"></div>
+
+      <div class="trans-layout">
+
+        <div>
+          <p>A transparência é considerada o princípio-chave da IA ética. Sem transparência, não há prestação de contas; sem prestação de contas, não há ética real — apenas aparência de ética.</p>
+
+          <div class="hex-codes" aria-hidden="true">
+            <span class="active-hex">0x4E45555241 0x4C5F4E4554 </span>0x574F524B20 0x414C474F52<br>
+            0x4954484D20 <span class="active-hex">0x54524149 0x4E494E47 </span>0x44415441<br>
+            0x4249415320 0x44455445 <span class="active-hex">0x4354494F4E </span>0x53595354<br>
+            0x454D530A20 <span class="active-hex">0x45544849 0x43414C </span>0x4652414D45<br>
+            0x574F524B20 0x434F4D50 <span class="active-hex">0x4C49414E43 </span>0x45205452<br>
+            0x414E535041 0x52454E43 <span class="active-hex">0x59204155 0x44495420</span>
+          </div>
+
+          <div class="trans-pillar" id="trans-validar">
+            <span class="trans-pillar-num">01</span>
+            <div>
+              <h4>VALIDAR RESULTADOS</h4>
+              <p>Os resultados gerados por sistemas de IA devem ser passíveis de validação independente. Isso significa que processos, dados de treinamento e metodologias devem ser acessíveis para verificação externa por especialistas e reguladores.</p>
+            </div>
+          </div>
+
+          <div class="trans-pillar" id="trans-auditabilidade">
+            <span class="trans-pillar-num">02</span>
+            <div>
+              <h4>AUDITABILIDADE</h4>
+              <p>Sistemas de IA que impactam decisões importantes — concessão de crédito, seleção de empregos, diagnósticos médicos, sentenças judiciais — devem ser auditáveis por órgãos independentes com autoridade legal para investigar e sancionar.</p>
+            </div>
+          </div>
+
+          <div class="trans-pillar" id="trans-vieses">
+            <span class="trans-pillar-num">03</span>
+            <div>
+              <h4>MITIGAÇÃO DE VIESES</h4>
+              <p>A transparência sobre os dados de treinamento e os processos de tomada de decisão é o primeiro passo para identificar e corrigir vieses algorítmicos antes que causem danos em escala.</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80&auto=format&fit=crop"
+            alt="Fluxo de dados e análise algorítmica em estilo Matrix"
+            class="section-img float-img"
+            style="margin-bottom: 1.5rem;"
+            loading="lazy"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80&auto=format&fit=crop"
+            alt="Análise de dados e descriptografia em neon"
+            class="section-img"
+            loading="lazy"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 8: PROTEÇÃO DE DADOS E GOVERNANÇA PÚBLICA
+  ==================================================== -->
+  <section id="protecao" aria-labelledby="prot-title">
+    <div class="container">
+      <p class="section-label">08 — PROTEÇÃO DE DADOS</p>
+      <h2 id="prot-title" class="neon-cyan">Proteção de Dados e Governança Pública</h2>
+      <div class="neon-divider"></div>
+
+      <div class="prot-layout">
+
+        <div>
+          <p>A proteção de dados pessoais é um dos alicerces da IA ética. Em um mundo onde sistemas de IA processam bilhões de registros de dados humanos, a privacidade deixou de ser um luxo e tornou-se um direito fundamental.</p>
+
+          <h3 style="color: var(--cyan); font-family: var(--font-title); font-size: 0.85rem; letter-spacing: 0.1em; margin: 1.5rem 0 1rem; text-shadow: 0 0 8px var(--cyan);">◈ DIRETRIZES FUNDAMENTAIS</h3>
+
+          <div class="shield-grid">
+            <div class="shield-item" id="shield-minimizacao">
+              <span class="si-icon">🛡️</span>
+              <h4>MINIMIZAÇÃO DE DADOS</h4>
+              <p>Coletar apenas os dados estritamente necessários para a finalidade declarada do sistema.</p>
+            </div>
+            <div class="shield-item" id="shield-consentimento">
+              <span class="si-icon">✅</span>
+              <h4>CONSENTIMENTO INFORMADO</h4>
+              <p>Garantir que cidadãos compreendam e concordem com o uso de seus dados por sistemas de IA.</p>
+            </div>
+            <div class="shield-item" id="shield-direito">
+              <span class="si-icon">🗑️</span>
+              <h4>DIREITO AO ESQUECIMENTO</h4>
+              <p>Assegurar que indivíduos possam solicitar a exclusão de seus dados dos sistemas de IA.</p>
+            </div>
+            <div class="shield-item" id="shield-seguranca">
+              <span class="si-icon">🔐</span>
+              <h4>SEGURANÇA POR PADRÃO</h4>
+              <p>Implementar mecanismos de criptografia e proteção como requisito de design, não como opção.</p>
+            </div>
+          </div>
+
+          <div class="gov-multi-box" id="gov-multidisciplinar">
+            <h3>◈ GOVERNANÇA MULTIDISCIPLINAR</h3>
+            <p>A governança eficaz da IA no setor público exige a colaboração de múltiplas disciplinas:</p>
+            <ul>
+              <li>Cientistas de dados e engenheiros de IA para aspectos técnicos</li>
+              <li>Juristas e especialistas em direitos humanos para conformidade legal</li>
+              <li>Filósofos e bioeticistas para avaliação de impacto moral</li>
+              <li>Representantes da sociedade civil para perspectiva cidadã</li>
+              <li>Especialistas em segurança cibernética para proteção de infraestrutura</li>
+              <li>Economistas para análise de impactos distributivos</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80&auto=format&fit=crop"
+            alt="Escudo holográfico e cadeado neon representando proteção de dados"
+            class="section-img float-img"
+            style="margin-bottom: 1.5rem;"
+            loading="lazy"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&q=80&auto=format&fit=crop"
+            alt="Segurança cibernética e proteção de dados digitais"
+            class="section-img"
+            loading="lazy"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-sep" aria-hidden="true"></div>
+
+  <!-- ====================================================
+       SEÇÃO 9: CONCLUSÃO
+  ==================================================== -->
+  <section id="conclusao" aria-labelledby="concl-title">
+    <div class="container">
+      <div class="concl-inner">
+        <span class="final-badge">◈ SÍNTESE FINAL</span>
+        <p class="section-label" style="justify-content: center;">09 — CONCLUSÃO</p>
+        <h2 id="concl-title" class="neon-cyan" style="text-align: center; font-size: clamp(2rem, 4vw, 3rem);">Conclusão</h2>
+        <div class="neon-divider" style="margin: 0 auto 2.5rem;"></div>
+
+        <p style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem; font-size: 1rem;">
+          O debate sobre Ética e Inteligência Artificial não tem respostas simples. Trata-se de uma tensão permanente entre liberdade e segurança, inovação e responsabilidade, eficiência e equidade. As visões a seguir sintetizam as principais correntes desse debate:
+        </p>
+
+        <div class="concl-cols">
+          <div class="concl-col-fav" id="concl-favoravel">
+            <h3>◈ VISÃO FAVORÁVEL À REGULAMENTAÇÃO</h3>
+            <p>A IA é uma tecnologia poderosa demais para ser deixada sem supervisão. A ausência de regulamentação beneficia apenas quem já detém poder e recursos, perpetuando desigualdades estruturais. Regulamentar é proteger os mais vulneráveis, garantir direitos fundamentais e assegurar que os benefícios da IA sejam distribuídos de forma justa.</p>
+            <ul>
+              <li>Proteção de direitos humanos na era digital</li>
+              <li>Accountability para desenvolvedores e operadores</li>
+              <li>Padrões éticos mínimos obrigatórios</li>
+              <li>Confiança pública nos sistemas de IA</li>
+              <li>Redução de danos sistêmicos e discriminação</li>
+            </ul>
+          </div>
+
+          <div class="concl-col-crit" id="concl-critica">
+            <h3>◈ VISÃO CRÍTICA À REGULAMENTAÇÃO</h3>
+            <p>O Estado não tem a capacidade técnica nem a neutralidade moral para regular eficazmente a IA. Regulamentações excessivas sufocam a inovação, criam oligopólios legais e representam uma expansão indevida do poder governamental sobre domínios que deveriam ser autorregulados pelo mercado e pela sociedade civil.</p>
+            <ul>
+              <li>Risco de captura regulatória por grandes corporações</li>
+              <li>Inibição da pesquisa e do desenvolvimento tecnológico</li>
+              <li>Conflito com liberdade de expressão e de pesquisa</li>
+              <li>Desigualdade entre países com diferentes marcos legais</li>
+              <li>Legitimidade questionável do Estado como árbitro moral</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mega-quote" id="reagan-quote">
+          <blockquote>
+            "The government is not the solution to our problem, the government is the problem."
+          </blockquote>
+          <cite>— Ronald Reagan, 1981 · Discurso de Posse Presidencial</cite>
+        </div>
+
+        <p style="text-align: center; max-width: 680px; margin: 0 auto; font-size: 0.95rem; color: var(--text-muted);">
+          Independentemente da posição adotada, o debate sobre ética na IA é urgente, necessário e deve envolver toda a sociedade. A tecnologia não é neutra — ela reflete e amplifica os valores de quem a cria e de quem a regula.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       FOOTER
+  ==================================================== -->
+  <footer>
+    <p class="footer-logo">IA ÉTICA</p>
+    <p>ÉTICA E INTELIGÊNCIA ARTIFICIAL &nbsp;|&nbsp; ANÁLISE CRÍTICA E MULTIDISCIPLINAR &nbsp;|&nbsp; 2025</p>
+  </footer>
+
+  <!-- ====================================================
+       JAVASCRIPT
+  ==================================================== -->
+  <script>
+    // ─── Background Canvas: Grid 3D + Particles ───────────────
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Particles
+      const PARTICLE_COUNT = 80;
+      function createParticle() {
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.5 + 0.3,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          alpha: Math.random() * 0.5 + 0.1,
+          color: Math.random() > 0.5 ? '0,255,255' : '0,123,255',
+        };
+      }
+      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(createParticle());
+
+      let t = 0;
+      function drawGrid() {
+        // Perspective grid
+        const COLS   = 24;
+        const ROWS   = 16;
+        const vp_x   = W * 0.5;
+        const vp_y   = H * 0.65;
+        const spread = W * 1.6;
+        const depth  = H * 0.6;
+        const pulse  = 0.5 + 0.5 * Math.sin(t * 0.6);
+        const alpha  = 0.06 + pulse * 0.04;
+
+        ctx.strokeStyle = `rgba(0,180,255,${alpha})`;
+        ctx.lineWidth   = 0.5;
+
+        // Horizontal lines
+        for (let r = 0; r <= ROWS; r++) {
+          const frac = r / ROWS;
+          const y = vp_y + frac * depth;
+          const xL = vp_x - (spread / 2) * frac;
+          const xR = vp_x + (spread / 2) * frac;
+          ctx.beginPath();
+          ctx.moveTo(xL, y);
+          ctx.lineTo(xR, y);
+          ctx.stroke();
+        }
+
+        // Vertical lines
+        for (let c = 0; c <= COLS; c++) {
+          const frac_h = (c / COLS) - 0.5;
+          const x_bottom = vp_x + frac_h * spread;
+          ctx.beginPath();
+          ctx.moveTo(vp_x, vp_y);
+          ctx.lineTo(x_bottom, vp_y + depth);
+          ctx.stroke();
+        }
+
+        // Top reflection
+        ctx.strokeStyle = `rgba(0,180,255,${alpha * 0.4})`;
+        const depthTop = H * 0.35;
+        for (let r = 0; r <= Math.floor(ROWS / 2); r++) {
+          const frac = r / ROWS;
+          const y = vp_y - frac * depthTop;
+          const xL = vp_x - (spread / 2) * frac;
+          const xR = vp_x + (spread / 2) * frac;
+          ctx.beginPath();
+          ctx.moveTo(xL, y);
+          ctx.lineTo(xR, y);
+          ctx.stroke();
+        }
+        for (let c = 0; c <= COLS; c++) {
+          const frac_h = (c / COLS) - 0.5;
+          const x_top = vp_x + frac_h * spread;
+          ctx.beginPath();
+          ctx.moveTo(vp_x, vp_y);
+          ctx.lineTo(x_top, vp_y - depthTop);
+          ctx.stroke();
+        }
+      }
+
+      function drawParticles() {
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = W;
+          if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H;
+          if (p.y > H) p.y = 0;
+
+          const pulse = 0.5 + 0.5 * Math.sin(t * 1.2 + p.x * 0.01);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.color},${p.alpha * pulse})`;
+          ctx.fill();
+        });
+
+        // Draw connections
+        ctx.lineWidth = 0.3;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const d  = Math.sqrt(dx * dx + dy * dy);
+            if (d < 120) {
+              const alpha = (1 - d / 120) * 0.12;
+              ctx.strokeStyle = `rgba(0,200,255,${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function frame() {
+        ctx.clearRect(0, 0, W, H);
+        t += 0.016;
+        drawGrid();
+        drawParticles();
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+
+    // ─── Navbar scroll effect ──────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // ─── Scroll-triggered fade-in animation ───────────────────
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'fadeInUp 0.7s ease both';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(
+      '.glass-card, .risk-item, .contra-item, .trans-pillar, .shield-item, .reg-card, .example-box, .quote-block, .carbon-quote, .mega-quote, .concl-col-fav, .concl-col-crit, .design-box, .gov-multi-box, .unesco-box'
+    ).forEach(el => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+
+    // ─── Active nav link highlight ─────────────────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(a => a.style.color = '');
+          const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+          if (active) {
+            active.style.color = 'var(--cyan)';
+            active.style.textShadow = '0 0 8px var(--cyan)';
+          }
+        }
+      });
+    }, { threshold: 0.4 });
+
+    sections.forEach(s => navObserver.observe(s));
+  </script>
+</body>
+</html>
