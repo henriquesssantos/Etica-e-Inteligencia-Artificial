@@ -4,6 +4,8 @@ Projeto front-end de uma página web imersiva focado no debate contemporâneo so
 
 Este trabalho foi desenvolvido como projeto de conclusão da disciplina de **Direito Aplicado à Informática** na 1ª fase do curso de **Análise e Desenvolvimento de Sistemas (ADS)**, combinando pesquisa jurídico-tecnológica com práticas de UI/UX Design (Estilo Cyberpunk/Sci-Fi) e manipulação gráfica avançada com JavaScript Vanilla.
 
+Este foi um projeto onde assumi o papel de Arquiteto e Engenheiro de Prompt. Como eu queria entregar uma experiência visualmente impressionante para o meu conteúdo da disciplina de Direito Digital, utilizei ferramentas de IA assistida (como o Cursor) como parceiras de desenvolvimento. Fui responsável por definir a arquitetura semântica, direcionar a lógica do Canvas, as regras de CSS e validar todo o comportamento de UI/UX, revisando e integrando o código final para garantir que fosse performático e otimizado.
+
 ---
 
 ## 🎯 Objetivo do Projeto
