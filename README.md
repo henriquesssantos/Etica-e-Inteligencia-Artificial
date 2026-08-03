@@ -48,7 +48,11 @@ O projeto não utiliza frameworks externos, evidenciando forte domínio do núcl
 
 Por ser estruturado de forma estática e autônoma, você pode rodá-lo localmente em segundos sem precisar instalar pacotes node.
 
-### 1. Acesso Rápido Local
+### 1. Visualização Online (Recomendado)
+Acesse a página em produção através do GitHub Pages:
+👉 **[Acessar a SPA](https://henriquesssantos.github.io/Etica-e-Inteligencia-Artificial/)**
+
+### 2. Acesso Rápido Local
 1. Clone este repositório no seu terminal:
    ```bash
    git clone [https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git](https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git)
